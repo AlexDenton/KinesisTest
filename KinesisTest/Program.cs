@@ -26,17 +26,10 @@ namespace KinesisTest
             var options = Configuration.GetAWSOptions();
             var amazonKinesisClient = options.CreateServiceClient<IAmazonKinesis>();
 
-            var streamName = "DentonStream";
+            var kinesisStreamManager = new KinesisStreamManager(amazonKinesisClient, "DentonStream");
             var partitionKey = "PartitionKey";
 
-            var putRecordRequest = new PutRecordRequest
-            {
-                StreamName = streamName,
-                PartitionKey = partitionKey,
-                Data = new MemoryStream(Encoding.UTF8.GetBytes("1"))
-            };
-
-            var putRecordResult = await amazonKinesisClient.PutRecordAsync(putRecordRequest);
+            var putRecordResult = await kinesisStreamManager.PutKinesisRecord("1", partitionKey);
         }
     }
 }
