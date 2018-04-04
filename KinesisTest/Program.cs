@@ -11,6 +11,7 @@ namespace KinesisTest
     class Program
     {
         private static IConfiguration Configuration;
+
         static void Main(string[] args)
         {
             Configuration = new ConfigurationBuilder()
