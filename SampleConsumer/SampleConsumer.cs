@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using Amazon.Kinesis.ClientLibrary;
 
@@ -118,7 +119,7 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
 
                         // Your own logic to process a record goes here.
 
-                        Console.Error.WriteLine($"I GOT A VALUE: {data}");
+                        File.AppendAllText("output.txt", $"Data: {data}\n");
 
                         processedSuccessfully = true;
                         break;
@@ -162,6 +163,7 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
         {
             try
             {
+                File.Delete("output.txt");
                 KclProcess.Create(new SampleRecordProcessor()).Run();
             }
             catch (Exception e) {

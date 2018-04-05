@@ -30,7 +30,10 @@ namespace KinesisTest
             var kinesisStreamManager = new KinesisStreamManager(amazonKinesisClient, "DentonStream");
             var partitionKey = "PartitionKey";
 
-            var putRecordResult = await kinesisStreamManager.PutKinesisRecord("1", partitionKey);
+            for (var i = 0; i < 10; i++)
+            {
+                var putRecordResult = await kinesisStreamManager.PutKinesisRecord(i.ToString(), partitionKey);
+            }
         }
     }
 }
