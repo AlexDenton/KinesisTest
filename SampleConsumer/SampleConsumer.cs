@@ -44,6 +44,8 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
         /// <value>The next checkpoint time expressed in milliseconds.</value>
         private DateTime _nextCheckpointTime = DateTime.UtcNow;
 
+        private int _RandomFileId;
+
         /// <summary>
         /// This method is invoked by the Amazon Kinesis Client Library before records from the specified shard
         /// are delivered to this SampleRecordProcessor.
@@ -56,6 +58,7 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
         {
             Console.Error.WriteLine("Initializing record processor for shard: " + input.ShardId);
             this._kinesisShardId = input.ShardId;
+            _RandomFileId = new Random().Next();
         }
 
         /// <summary>
@@ -119,7 +122,7 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
 
                         // Your own logic to process a record goes here.
 
-                        File.AppendAllText("output.txt", $"Data: {data}\n");
+                        File.AppendAllText($"output{_RandomFileId}.txt", $"Data: {data}\n");
 
                         processedSuccessfully = true;
                         break;
