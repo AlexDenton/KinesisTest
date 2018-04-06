@@ -59,6 +59,7 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
             Console.Error.WriteLine("Initializing record processor for shard: " + input.ShardId);
             this._kinesisShardId = input.ShardId;
             _RandomFileId = new Random().Next();
+            File.AppendAllText($"output{_RandomFileId}.txt", $"{_RandomFileId} maps to {input.ShardId}");
         }
 
         /// <summary>
@@ -122,7 +123,7 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
 
                         // Your own logic to process a record goes here.
 
-                        File.AppendAllText($"output{_RandomFileId}.txt", $"Data: {data}\n");
+                        File.AppendAllText($"output{_RandomFileId}.txt", $"Data: {data} from {_kinesisShardId} with sequence number {rec.SequenceNumber}\n");
 
                         processedSuccessfully = true;
                         break;
@@ -166,7 +167,7 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
         {
             try
             {
-                File.Delete("output.txt");
+                KclProcess.Create(new SampleRecordProcessor()).Run();
                 KclProcess.Create(new SampleRecordProcessor()).Run();
             }
             catch (Exception e) {

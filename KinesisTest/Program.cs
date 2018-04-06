@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon.Kinesis;
@@ -28,12 +30,19 @@ namespace KinesisTest
             var amazonKinesisClient = options.CreateServiceClient<IAmazonKinesis>();
 
             var kinesisStreamManager = new KinesisStreamManager(amazonKinesisClient, "DentonStream");
-            var partitionKey = "PartitionKey";
+
+            var tasks = new List<Task<PutRecordsResponse>>();
 
             for (var i = 0; i < 100; i++)
             {
-                var putRecordResult = await kinesisStreamManager.PutKinesisRecord(i.ToString(), partitionKey);
+                var data = Enumerable.Range(0, 500).Select(j => j.ToString());
+
+                var randomPartitionKey = new Random().Next().ToString();
+                var putRecordsResponseTask = kinesisStreamManager.PutKinesisRecords(data, randomPartitionKey);
+                tasks.Add(putRecordsResponseTask);
             }
+
+            var results = await Task.WhenAll(tasks);
         }
     }
 }
