@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Amazon.Kinesis.ClientLibrary;
 
 namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
 {
@@ -59,7 +58,7 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
             Console.Error.WriteLine("Initializing record processor for shard: " + input.ShardId);
             this._kinesisShardId = input.ShardId;
             _RandomFileId = new Random().Next();
-            File.AppendAllText($"output{_RandomFileId}.txt", $"{_RandomFileId} maps to {input.ShardId}");
+            File.AppendAllText($"output{_RandomFileId}.txt", $"{_RandomFileId} maps to {input.ShardId}\n");
         }
 
         /// <summary>
@@ -106,6 +105,8 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
         /// <param name="records">The records to be processed.</param>
         private void ProcessRecordsWithRetries(List<Record> records)
         {
+            var userNotificationCounts = new Dictionary<string, int>();
+
             foreach (Record rec in records)
             {
                 bool processedSuccessfully = false;
@@ -123,7 +124,14 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
 
                         // Your own logic to process a record goes here.
 
-                        File.AppendAllText($"output{_RandomFileId}.txt", $"Data: {data} from {_kinesisShardId} with sequence number {rec.SequenceNumber}\n");
+                        if (userNotificationCounts.ContainsKey(rec.PartitionKey))
+                        {
+                            userNotificationCounts[rec.PartitionKey]++;
+                        }
+                        else
+                        {
+                            userNotificationCounts.Add(rec.PartitionKey, 1);
+                        }
 
                         processedSuccessfully = true;
                         break;
@@ -138,6 +146,14 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
                 if (!processedSuccessfully)
                 {
                     Console.Error.WriteLine("Couldn't process record " + rec + ". Skipping the record.");
+                }
+
+                using (var streamWriter = File.AppendText($"output{_RandomFileId}.txt"))
+                {
+                    foreach (var userNotificationCount in userNotificationCounts)
+                    {
+                        streamWriter.WriteLine($"User {userNotificationCount.Key} had {userNotificationCount.Value} notifications");
+                    }
                 }
             }
         }
