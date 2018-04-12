@@ -147,13 +147,14 @@ namespace Amazon.Kinesis.ClientLibrary.SampleConsumer
                 {
                     Console.Error.WriteLine("Couldn't process record " + rec + ". Skipping the record.");
                 }
+            }
 
-                using (var streamWriter = File.AppendText($"output{_RandomFileId}.txt"))
+            using (var streamWriter = File.AppendText($"output{_RandomFileId}.txt"))
+            {
+                streamWriter.WriteLine("Batch report:");
+                foreach (var userNotificationCount in userNotificationCounts)
                 {
-                    foreach (var userNotificationCount in userNotificationCounts)
-                    {
-                        streamWriter.WriteLine($"User {userNotificationCount.Key} had {userNotificationCount.Value} notifications");
-                    }
+                    streamWriter.WriteLine($"User {userNotificationCount.Key} had {userNotificationCount.Value} notifications");
                 }
             }
         }

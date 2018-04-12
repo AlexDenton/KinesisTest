@@ -6,7 +6,7 @@ namespace KinesisTest
 {
     public class UserNotificationSimulator
     {
-        private readonly TimeSpan _DelayInterval = TimeSpan.FromSeconds(1);
+        private readonly TimeSpan _DelayInterval = TimeSpan.FromMilliseconds(100);
 
         private readonly Random _RandomNumberGenerator = new Random();
 
@@ -21,7 +21,7 @@ namespace KinesisTest
         {
             while (true)
             {
-                var userId = _RandomNumberGenerator.Next(0, 100);
+                var userId = _RandomNumberGenerator.Next(0, 20);
                 await _KinesisStreamManager.PutKinesisRecord("Notification", userId.ToString());
                 await Task.Delay(_DelayInterval);
             }
